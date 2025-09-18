@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Deteksi Lokasi Otomatis</title>
+</head>
+<body>
+    <h2>Deteksi Lokasi Otomatis dan Ubah ke Alamat</h2>
+    <p id="status">Mendeteksi lokasi...</p>
+    <p id="koordinat"></p>
+    <p id="alamat"></p>
+
+    <script>
+        // Fungsi ambil alamat dari koordinat
+        function getAlamatDariKoordinat(lat, lon) {
+            const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&accept-language=id`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("alamat").textContent = "Alamat: " + data.display_name;
+                })
+                .catch(error => {
+                    document.getElementById("alamat").textContent = "Gagal mengambil alamat.";
+                    console.error(error);
+                });
+        }
+
+        // Deteksi lokasi pengguna
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (posisi) => {
+                    const lat = posisi.coords.latitude;
+                    const lon = posisi.coords.longitude;
+
+                    document.getElementById("status").textContent = "Lokasi berhasil dideteksi.";
+                    document.getElementById("koordinat").textContent = `Koordinat: ${lat}, ${lon}`;
+
+                    getAlamatDariKoordinat(lat, lon);
+                },
+                (error) => {
+                    document.getElementById("status").textContent = "Gagal mendeteksi lokasi: " + error.message;
+                }
+            );
+        } else {
+            document.getElementById("status").textContent = "Browser tidak mendukung geolokasi.";
+        }
+    </script>
+</body>
+</html>
